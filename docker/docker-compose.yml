@@ -1,0 +1,46 @@
+
+version: '3'
+
+services:
+  db:
+    image: mysql:5.7
+    container_name: dalev_mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: test_db
+      MYSQL_USER: user
+      MYSQL_PASSWORD: password
+    ports:
+      - "9906:3306"
+  web:
+    build: './php/'
+    container_name: dalev_php
+    depends_on:
+      - db
+    volumes:
+      - ../src/:/var/www/html/
+    ports:
+      - "8100:80"
+    stdin_open: true
+    tty: true
+  composer:
+    image: composer:1.9
+    container_name: dalev_composer
+    command: ["composer", "install"]
+    volumes:
+      - ../src/:/app
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: dalev_phpmyadmin
+    depends_on:
+      - db
+    environment:
+      PMA_HOST: db
+      PMA_PORT: 3306
+      PMA_USER: user
+      PMA_PASSWORD: password
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_USER: user
+      MYSQL_PASSWORD: password
+    ports:
+      - "8101:80"
